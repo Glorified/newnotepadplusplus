@@ -3,10 +3,11 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import SlateEditor from "./SlateEditor";
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+      <SlateEditor/>
   </React.StrictMode>,
   document.getElementById('root')
 );
