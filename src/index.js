@@ -4,10 +4,14 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import SlateEditor from "./SlateEditor";
+import Container from "./storageui";
+import ScrollableTabsButtonAuto from "./ScrollableTabs";
 
 ReactDOM.render(
   <React.StrictMode>
-      <SlateEditor/>
+    {/* <SlateEditor/>*/}
+      <ScrollableTabsButtonAuto/>
+      {/*<Container/>*/}
   </React.StrictMode>,
   document.getElementById('root')
 );
