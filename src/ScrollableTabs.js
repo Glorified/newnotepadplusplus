@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
@@ -7,9 +7,14 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import Box from '@material-ui/core/Box';
 import SlateEditor from "./SlateEditor";
-
+import DraftEditor from "./DraftEditor";
+import {useDispatch, useSelector} from "react-redux";
+import {abc} from "./redux/pageSlice";
+import {EditorState,convertToRaw,convertFromRaw} from "draft-js";
+import {useSelected} from "slate-react";
 
 function TabPanel(props) {
+
     const { children, value, index, ...other } = props;
 
     return (
@@ -50,40 +55,76 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-
-
-
-
 export default function ScrollableTabsButtonAuto() {
+
+
+    const dispatch = useDispatch();
+
+    // dispatch(abc(counter))
     const classes = useStyles();
+    const [currentPageId, setCurrentPageId] = useState("scrollable-auto-tab-0");
+
+    const sctabe = useSelector(state => state.pageReducer[currentPageId]);
+    console.log("sctabe", sctabe);
+    let editorState1;
+    if (sctabe)
+    {editorState1 = convertFromRaw(sctabe);}
     const [value, setValue] = React.useState(0);
-
+    const [throwAwayVar,setThrowAwayVar] =  React.useState(0);
+    //console.log("editorStateBefore",editorState1.getPlainText(""),currentPageId);
+    console.log("ekys",Object.keys(useSelector(state => state.pageReducer)))
+    const keyList = useSelector(state => state.pageReducer);
     const handleChange = (event, newValue) => {
+      //  editorState1 = useSelector(state =>state.pageReducer[currentPageId])
+        console.log("handleChange with old value",value);
+        setCurrentPageId(`scrollable-auto-tab-${newValue}`)
         setValue(newValue);
+        console.log("handleChange with new value",newValue,currentPageId);
     };
+    const [tabarray,settabarray] = useState([]);
+    useEffect(()=>{
 
-    const defaultarray = [ <Tab label="Item One" {...a11yProps(0)} />,
-        <Tab label="Item Two" {...a11yProps(1)} />,
-        <Tab label="Item Three" {...a11yProps(2)} />,
-        <Tab label="Item Four" {...a11yProps(3)} />,
-        <Tab label="Item Five" {...a11yProps(4)} />,
-        <Tab label="Item Six" {...a11yProps(5)} />,
-        <Tab label="Item Seven" {...a11yProps(6)} />]
-    const addnewtab = () =>{
-        setValue(8)
-        let newarr =  defaultarray.push();
-    settabarray(oldstate =>[...oldstate,<Tab label="Item Two" {...a11yProps(8)} /> ]);
-    setPages(oldstate =>[...oldstate, <SlateEditor value={value} index={8}/> ])
+        const tempArr = [];
+        for(let items of Object.keys(keyList)){
+            const index = items.split("scrollable-auto-tab-")[1];
+            tempArr.push(<Tab label={`Fl ${index}`}  {...a11yProps(index)} key={index} />)
+        }
+       tempArr.length? settabarray(tempArr):  settabarray(oldstate =>[...oldstate,<Tab label={`Fl 0`}  {...a11yProps(0)} key={0}/> ]);
 
+    },[])
+
+    const func = () =>{
+        console.log("called")
+        setThrowAwayVar(prevState => prevState+1);
     }
-    const [tabarray,settabarray] = useState(()=>{
-        return defaultarray;
+    //setThrowAwayVar(prevState => prevState+1)
+    useEffect(() => {
+        window.addEventListener("storage", func);
+        return () => {
+            window.removeEventListener("storage", func);
+        };
+    },[] );
 
-    });
+    const addnewtab = () =>{
+         setValue(tabarray.length);
+         setCurrentPageId(`scrollable-auto-tab-${tabarray.length}`);
+         settabarray(oldstate =>[...oldstate,<Tab label={`Fl ${tabarray.length}`}  {...a11yProps(tabarray.length)} key={tabarray.length}/> ]);
+         dispatch(abc({id:`scrollable-auto-tab-${tabarray.length}`,body:convertToRaw(EditorState.createEmpty().getCurrentContent())}))
+    }
 
-    const [pages,setPages] = useState( []);
+ /*   useEffect(()=>{
+        settabarray(defaultarray)
+    },[])*/
+/*
+    useEffect(()=>{
+        b(editorState1)
+    },[editorState1]);
+*/
 
-
+const somefunc = (stateObj) =>{
+   console.log("desasldfjal;sjfl;asjfl;",stateObj)
+    dispatch(abc({id:currentPageId,body:convertToRaw(stateObj.getCurrentContent())}))
+};
 
     return (
         <div className={classes.root}>
@@ -100,27 +141,7 @@ export default function ScrollableTabsButtonAuto() {
                     {tabarray}
                 </Tabs>
             </AppBar>
-            <SlateEditor value={value} index={0}/>
-            <SlateEditor value={value} index={1} />
-            <TabPanel value={value} index={2}>
-                Item Three
-            </TabPanel>
-            <TabPanel value={value} index={3}>
-                Item Four
-            </TabPanel>
-            <TabPanel value={value} index={4}>
-                Item Five
-            </TabPanel>
-            <TabPanel value={value} index={5}>
-                Item Six
-            </TabPanel>
-            <TabPanel value={value} index={6}>
-                Item Seven
-            </TabPanel>
-            <TabPanel value={value} index={7}>
-                Item Seven
-            </TabPanel>
-            {pages}
+            {editorState1 && <DraftEditor keyq={EditorState.createWithContent(editorState1)} callback={somefunc}/>}
             <button onClick={addnewtab}>new tab</button>
         </div>
     );

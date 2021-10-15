@@ -3,7 +3,7 @@ import './App.css';
 import { Editor, EditorState, RichUtils, SelectionState, ContentState, convertFromRaw, convertToRaw} from 'draft-js';
 const  App = (props) => {
 
-    const storageKey = props.index;
+    const storageKey = "name";
     const storeRaw = localStorage.getItem(storageKey);
     const [editorState, setEditorState] = useState(()=>{
         if (storeRaw) {
@@ -13,16 +13,6 @@ const  App = (props) => {
             return EditorState.createEmpty();
         }
     });
-
-    const abc = () => {
-
-        if (storeRaw) {
-            const rawContentFromStore = convertFromRaw(JSON.parse(storeRaw));
-            return EditorState.createWithContent(rawContentFromStore);
-        } else {
-            return EditorState.createEmpty();
-        }
-    };
 
 
 const  saveRaw = () => {
@@ -50,16 +40,22 @@ const  saveRaw = () => {
         setEditorState(e);
         saveRaw();
     };
-    useEffect(() => {
 
+    useEffect(() => {
       window.addEventListener("storage", onStorageUpdate);
         return () => {
             window.removeEventListener("storage", onStorageUpdate);
         };
     }, );
-
     const ref1 = useRef();
-
+   const handleKeyCommand = (command) => {
+        const newState = RichUtils.handleKeyCommand(editorState, command)
+        if (newState) {
+            handleChange(newState);
+            return 'handled';
+        }
+        return 'not-handled';
+    }
         return (
             <div className="my-little-app" hidden={ false/*props.value !== props.index*/}>
                 <h1>Playing with Draft!</h1>
@@ -81,6 +77,7 @@ const  saveRaw = () => {
                     <Editor
                         editorState={editorState}
                         onChange={handleChange}
+                        handleKeyCommand={handleKeyCommand}
                         ref={ref1}
                         toolbar={{
                             inline: { inDropdown: true },

@@ -4,20 +4,24 @@
   "private": true,
   "dependencies": {
     "@material-ui/core": "^4.12.3",
+    "@reduxjs/toolkit": "^1.6.1",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
     "draft-js": "^0.11.7",
+    "postman-to-openapi": "^1.17.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-redux": "^7.2.5",
     "react-scripts": "4.0.3",
+    "redux-state-sync": "^3.1.2",
     "slate": "^0.65.3",
     "slate-history": "^0.65.3",
     "slate-react": "^0.65.3",
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "PORT=3003 react-scripts start",
+    "start": "PORT=3006 react-scripts start",
     "build": "INLINE_RUNTIME_CHUNK=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
